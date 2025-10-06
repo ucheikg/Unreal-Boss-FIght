@@ -1,0 +1,74 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Creed.h"
+#include "Camera/CameraComponent.h"
+
+// Sets default values
+ACreed::ACreed()
+{
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
+	Camera->SetupAttachment(RootComponent);
+	Camera->bUsePawnControlRotation = true;
+
+}
+
+// Called when the game starts or when spawned
+void ACreed::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+// Called every frame
+void ACreed::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+// Called to bind functionality to input
+void ACreed::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAxis("MoveFoward", this, &ACreed::MoveFoward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ACreed::MoveRight);
+
+	PlayerInputComponent->BindAxis("TurnCamera", this, &ACreed::TurnCamera);
+	PlayerInputComponent->BindAxis("LookUp", this, &ACreed::LookUp);
+}
+
+void ACreed::MoveFoward(float InputValue)
+{
+
+	FVector FowardDirection = GetActorForwardVector();
+	AddMovementInput(FowardDirection, InputValue);
+
+}
+
+void ACreed::MoveRight(float InputValue)
+{
+
+	FVector RightDirection = GetActorRightVector();
+	AddMovementInput(RightDirection, InputValue);
+
+}
+
+void ACreed::TurnCamera(float InputVlaue)
+{
+
+	AddControllerYawInput(InputVlaue);
+
+}
+
+void ACreed::LookUp(float InputValue)
+{
+
+	AddControllerPitchInput(InputValue);
+
+}
+
+
