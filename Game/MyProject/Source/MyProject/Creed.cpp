@@ -3,6 +3,8 @@
 
 #include "Creed.h"
 #include "Camera/CameraComponent.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/Actor.h"
 
 // Sets default values
 ACreed::ACreed()
@@ -12,7 +14,6 @@ ACreed::ACreed()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
 	Camera->bUsePawnControlRotation = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -26,6 +27,21 @@ void ACreed::BeginPlay()
 void ACreed::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	FVector start = GetActorLocation();
+	FVector end = start + (GetActorForwardVector() * 1000);
+
+	FHitResult HitResult;
+	FCollisionQueryParams collisionParams;
+	collisionParams.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, start, end, ECC_Visibility, collisionParams);
+	DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.0f);
+
+	if (bHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+	}
 
 }
 
