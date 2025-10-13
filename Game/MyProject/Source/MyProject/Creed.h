@@ -4,12 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/StaticMeshComponent.h"
 #include "Creed.generated.h"
+
 
 UCLASS()
 class MYPROJECT_API ACreed : public ACharacter
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* Glove;
 
 public:
 	// Sets default values for this character's properties
@@ -25,15 +30,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(VisibleAnywhere)
-	USceneComponent* Root;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Parts")
-	UStaticMeshComponent* Gloves;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Parts")
-	UStaticMeshComponent* Chest;
 
 protected:
 	UPROPERTY(EditAnywhere)

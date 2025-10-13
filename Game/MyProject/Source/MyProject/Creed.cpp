@@ -14,14 +14,8 @@ ACreed::ACreed()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
 	Camera->bUsePawnControlRotation = true;
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
-	Gloves = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Gloves"));
-	Gloves->SetupAttachment(Root);
-
-	Chest = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Chest"));
-	Chest->SetupAttachment(Root);
-
+	Glove = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
+	Glove->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -36,8 +30,8 @@ void ACreed::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	FVector start = Chest->GetComponentLocation();
-	FVector end = start + (Chest->GetForwardVector() * 1000);
+	FVector start = Camera->GetComponentLocation();
+	FVector end = start + (Camera->GetForwardVector() * 1000);
 
 	FHitResult HitResult;
 	FCollisionQueryParams collisionParams;
