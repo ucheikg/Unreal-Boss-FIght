@@ -32,6 +32,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
+	
+	float alpha;
+	bool isLerping;
+	bool isReturning;
+
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
 
@@ -40,4 +45,13 @@ protected:
 
 	void TurnCamera(float InputVlaue);
 	void LookUp(float InputValue);
+
+	void leftHook();
+	
+	float lerpSpeed = 1.5f;
+	float travelDistance = 1000.0f;
+
+	FVector startLocation;
+	FVector targetLocation;
+
 };

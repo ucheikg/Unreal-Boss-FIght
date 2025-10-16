@@ -16,6 +16,10 @@ ACreed::ACreed()
 	Camera->bUsePawnControlRotation = true;
 	Glove = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	Glove->SetupAttachment(RootComponent);
+	alpha = 0.0f;
+	isLerping = false;
+	isReturning = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -40,9 +44,38 @@ void ACreed::Tick(float DeltaTime)
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, start, end, ECC_Visibility, collisionParams);
 	DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.0f);
 
+	targetLocation = end;
+
 	if (bHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+	}
+
+	if (isLerping) {
+		alpha += DeltaTime * lerpSpeed;
+		alpha = FMath::Clamp(alpha, 0.0f, 1.0f);
+
+		FVector newLocation;
+		if (!isReturning) {
+			newLocation = FMath::Lerp(startLocation, targetLocation, alpha);
+		}
+		else {
+			newLocation = FMath::Lerp(targetLocation, startLocation, alpha);
+		}
+		Glove->SetWorldLocation(newLocation);
+
+		if (alpha >= 0.1f) {
+			if (!isReturning) {
+				isReturning = true;
+				alpha = 0.0f;
+			}
+			else {
+				isLerping = false;
+				isReturning = false;
+				alpha = 0.0f;
+			}
+		}
+
 	}
 
 }
@@ -51,7 +84,9 @@ void ACreed::Tick(float DeltaTime)
 void ACreed::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACreed::Jump);
+	PlayerInputComponent->BindAction("leftHook", IE_Pressed, this, &ACreed::leftHook);
+	
 	PlayerInputComponent->BindAxis("MoveFoward", this, &ACreed::MoveFoward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACreed::MoveRight);
 
@@ -87,6 +122,19 @@ void ACreed::LookUp(float InputValue)
 
 	AddControllerPitchInput(InputValue);
 
+}
+
+void ACreed::leftHook()
+{
+
+	if (isLerping) return;
+	startLocation = Glove->GetComponentLocation();
+	FVector gloveFoward = Glove->GetForwardVector();
+	targetLocation = startLocation + gloveFoward * travelDistance;
+
+	alpha = 0.0f;
+	isLerping = true;
+	isReturning = false;
 }
 
 
