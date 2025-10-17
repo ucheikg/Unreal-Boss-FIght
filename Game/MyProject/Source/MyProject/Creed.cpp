@@ -19,6 +19,7 @@ ACreed::ACreed()
 	alpha = 0.0f;
 	isLerping = false;
 	isReturning = false;
+	delay = 3.0f;
 
 }
 
@@ -34,17 +35,17 @@ void ACreed::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	FVector start = Camera->GetComponentLocation();
-	FVector end = start + (Camera->GetForwardVector() * 1000);
+	startPoint = Camera->GetComponentLocation();
+	endPoint = startPoint + (Camera->GetForwardVector() * 1000);
 
 	FHitResult HitResult;
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, start, end, ECC_Visibility, collisionParams);
-	DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.0f);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
+	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
 
-	targetLocation = end;
+	targetLocation = endPoint;
 
 	if (bHit)
 	{
@@ -63,17 +64,35 @@ void ACreed::Tick(float DeltaTime)
 			newLocation = FMath::Lerp(targetLocation, startLocation, alpha);
 		}
 		Glove->SetWorldLocation(newLocation);
-
+		if (GEngine)
+		{
+			float DeltaTime = GetWorld()->DeltaTimeSeconds;
+			
+		}
 		if (alpha >= 0.1f) {
 			if (!isReturning) {
 				isReturning = true;
 				alpha = 0.0f;
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					10.0f,
+					FColor::Blue,
+					FString::Printf(TEXT("return true"))
+				);
 			}
-			else {
+			else
+			{
 				isLerping = false;
 				isReturning = false;
 				alpha = 0.0f;
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					10.0f,
+					FColor::Blue,
+					FString::Printf(TEXT("Return false: %f"), alpha)
+				);
 			}
+			
 		}
 
 	}
@@ -129,8 +148,6 @@ void ACreed::leftHook()
 
 	if (isLerping) return;
 	startLocation = Glove->GetComponentLocation();
-	FVector gloveFoward = Glove->GetForwardVector();
-	targetLocation = startLocation + gloveFoward * travelDistance;
 
 	alpha = 0.0f;
 	isLerping = true;

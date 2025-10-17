@@ -48,10 +48,14 @@ protected:
 
 	void leftHook();
 	
-	float lerpSpeed = 1.5f;
+	float lerpSpeed = 0.5f;
 	float travelDistance = 1000.0f;
+	float delay;
 
 	FVector startLocation;
 	FVector targetLocation;
+
+	FVector startPoint;
+	FVector endPoint;
 
 };
