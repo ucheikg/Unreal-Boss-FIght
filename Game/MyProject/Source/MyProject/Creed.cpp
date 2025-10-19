@@ -11,11 +11,16 @@ ACreed::ACreed()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
 	Camera->bUsePawnControlRotation = true;
+	
 	Glove = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	Glove->SetupAttachment(RootComponent);
+	Lorigin = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
+	Lorigin->SetupAttachment(RootComponent);
+
 	alpha = 0.0f;
 	isLerping = false;
 	isReturning = false;
@@ -69,28 +74,14 @@ void ACreed::Tick(float DeltaTime)
 			float DeltaTime = GetWorld()->DeltaTimeSeconds;
 			
 		}
-		if (alpha >= 0.1f) {
+		if (alpha >= 1.0f) {
 			if (!isReturning) {
 				isReturning = true;
-				alpha = 0.0f;
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					10.0f,
-					FColor::Blue,
-					FString::Printf(TEXT("return true"))
-				);
 			}
 			else
 			{
 				isLerping = false;
 				isReturning = false;
-				alpha = 0.0f;
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					10.0f,
-					FColor::Blue,
-					FString::Printf(TEXT("Return false: %f"), alpha)
-				);
 			}
 			
 		}
@@ -147,7 +138,8 @@ void ACreed::leftHook()
 {
 
 	if (isLerping) return;
-	startLocation = Glove->GetComponentLocation();
+	startLocation = Lorigin->GetComponentLocation();
+	Glove->GetForwardVector() = Lorigin->GetForwardVector();
 
 	alpha = 0.0f;
 	isLerping = true;

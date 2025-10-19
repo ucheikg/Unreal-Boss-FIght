@@ -15,6 +15,9 @@ class MYPROJECT_API ACreed : public ACharacter
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Glove;
+	
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* Lorigin;
 
 public:
 	// Sets default values for this character's properties
@@ -48,7 +51,7 @@ protected:
 
 	void leftHook();
 	
-	float lerpSpeed = 0.5f;
+	float lerpSpeed = 1.5f;
 	float travelDistance = 1000.0f;
 	float delay;
 
