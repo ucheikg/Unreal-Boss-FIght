@@ -14,10 +14,16 @@ class MYPROJECT_API ACreed : public ACharacter
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* Glove;
+	UStaticMeshComponent* lGlove;
 	
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Lorigin;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* rGlove;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* Rorigin;
 
 public:
 	// Sets default values for this character's properties
@@ -36,9 +42,12 @@ public:
 
 protected:
 	
-	float alpha;
-	bool isLerping;
-	bool isReturning;
+	float lAlpha;
+	bool lIsLerping;
+	bool lIsReturning;
+	bool rIsLerping;
+	bool rIsReturning;
+	float rAlpha;
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
@@ -50,12 +59,15 @@ protected:
 	void LookUp(float InputValue);
 
 	void leftHook();
+	void rightHook();
 	
-	float lerpSpeed = 1.5f;
+	float lLerpSpeed = 1.9f;
+	float rLerpSpeed = 1.9f;
 	float travelDistance = 1000.0f;
 	float delay;
 
-	FVector startLocation;
+	FVector lStartLocation;
+	FVector rStartLocation;
 	FVector targetLocation;
 
 	FVector startPoint;

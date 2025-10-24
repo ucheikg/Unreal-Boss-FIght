@@ -16,15 +16,24 @@ ACreed::ACreed()
 	Camera->SetupAttachment(RootComponent);
 	Camera->bUsePawnControlRotation = true;
 	
-	Glove = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
-	Glove->SetupAttachment(RootComponent);
-	Lorigin = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
+	lGlove = CreateDefaultSubobject<UStaticMeshComponent>("lGlove");
+	lGlove->SetupAttachment(RootComponent);
+	rGlove = CreateDefaultSubobject<UStaticMeshComponent>("rGlove");
+	rGlove->SetupAttachment(RootComponent);
+	
+	
+	Lorigin = CreateDefaultSubobject<UStaticMeshComponent>("Loriginmesh");
 	Lorigin->SetupAttachment(RootComponent);
+	Rorigin = CreateDefaultSubobject<UStaticMeshComponent>("Rorigin");
+	Rorigin->SetupAttachment(RootComponent);
 
-	alpha = 0.0f;
-	isLerping = false;
-	isReturning = false;
-	delay = 3.0f;
+	lAlpha = 0.0f;
+	lIsLerping = false;
+	lIsReturning = false;
+	
+	rAlpha = 0.0f;
+	rIsLerping = false;
+	rIsReturning = false;
 
 }
 
@@ -51,37 +60,77 @@ void ACreed::Tick(float DeltaTime)
 	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
 
 	targetLocation = endPoint;
+	lStartLocation = Lorigin->GetComponentLocation();
+	rStartLocation = Rorigin->GetComponentLocation();
 
 	if (bHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
 	}
 
-	if (isLerping) {
-		alpha += DeltaTime * lerpSpeed;
-		alpha = FMath::Clamp(alpha, 0.0f, 1.0f);
+	if (rIsLerping) 
+	{
+		rAlpha += DeltaTime * rLerpSpeed;
+		rAlpha = FMath::Clamp(rAlpha, 0.0f, 1.0f);
 
-		FVector newLocation;
-		if (!isReturning) {
-			newLocation = FMath::Lerp(startLocation, targetLocation, alpha);
+		FVector rnewLocation;
+
+		if (!rIsReturning) {
+			rnewLocation = FMath::Lerp(rStartLocation, targetLocation, rAlpha);
 		}
 		else {
-			newLocation = FMath::Lerp(targetLocation, startLocation, alpha);
+			rnewLocation = FMath::Lerp(targetLocation, rStartLocation, rAlpha);
 		}
-		Glove->SetWorldLocation(newLocation);
-		if (GEngine)
-		{
-			float DeltaTime = GetWorld()->DeltaTimeSeconds;
-			
-		}
-		if (alpha >= 1.0f) {
-			if (!isReturning) {
-				isReturning = true;
+
+		rGlove->SetWorldLocation(rnewLocation);
+
+
+		if (rAlpha >= 1.0f) {
+
+			if (!rIsReturning) {
+				rIsReturning = true;
+				rAlpha = 0.0f;
 			}
 			else
 			{
-				isLerping = false;
-				isReturning = false;
+				rIsLerping = false;
+				rIsReturning = false;
+				rAlpha = 0.0f;
+			}
+		}
+	}
+	
+	if (lIsLerping) {
+		lAlpha += DeltaTime * lLerpSpeed;
+		lAlpha = FMath::Clamp(lAlpha, 0.0f, 1.0f);
+
+		FVector lnewLocation;
+		if (!lIsReturning) {
+			lnewLocation = FMath::Lerp(lStartLocation, targetLocation, lAlpha);
+		}
+		else {
+			lnewLocation = FMath::Lerp(targetLocation, lStartLocation, lAlpha);
+		}
+
+
+		lGlove->SetWorldLocation(lnewLocation);
+		
+		if (GEngine)
+		{
+			float DeltaTime = GetWorld()->DeltaTimeSeconds;	
+		}
+
+		if (lAlpha >= 1.0f) {
+			
+			if (!lIsReturning) {
+				lIsReturning = true;
+				lAlpha = 0.0f;
+			}
+			else
+			{
+				lIsLerping = false;
+				lIsReturning = false;
+				lAlpha = 0.0f;
 			}
 			
 		}
@@ -96,6 +145,7 @@ void ACreed::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACreed::Jump);
 	PlayerInputComponent->BindAction("leftHook", IE_Pressed, this, &ACreed::leftHook);
+	PlayerInputComponent->BindAction("rightHook", IE_Pressed, this, &ACreed::rightHook);
 	
 	PlayerInputComponent->BindAxis("MoveFoward", this, &ACreed::MoveFoward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACreed::MoveRight);
@@ -137,13 +187,23 @@ void ACreed::LookUp(float InputValue)
 void ACreed::leftHook()
 {
 
-	if (isLerping) return;
-	startLocation = Lorigin->GetComponentLocation();
-	Glove->GetForwardVector() = Lorigin->GetForwardVector();
+	if (lIsLerping) return;
+	lGlove->GetForwardVector() = Lorigin->GetForwardVector();
 
-	alpha = 0.0f;
-	isLerping = true;
-	isReturning = false;
+	lAlpha = 0.0f;
+	lIsLerping = true;
+	lIsReturning = false;
+}
+
+void ACreed::rightHook() 
+{
+	if (rIsLerping) return;
+	rGlove->GetForwardVector() = Rorigin->GetForwardVector();
+	
+
+	rAlpha = 0.0f;
+	rIsLerping = true;
+	rIsReturning = false;
 }
 
 
