@@ -35,6 +35,11 @@ ACreed::ACreed()
 	rIsLerping = false;
 	rIsReturning = false;
 
+	health = 100.0f;
+	power = 5.0f;
+
+	radius = 20.0f;
+
 }
 
 // Called when the game starts or when spawned
@@ -52,12 +57,24 @@ void ACreed::Tick(float DeltaTime)
 	startPoint = Camera->GetComponentLocation();
 	endPoint = startPoint + (Camera->GetForwardVector() * 1000);
 
+	rStart = rGlove->GetComponentLocation();
+	lStart = lGlove->GetComponentLocation();
+
+	lEnd = lStart + (lGlove->GetForwardVector() * radius);
+	rEnd = rStart + (rGlove->GetForwardVector() * radius);
+
 	FHitResult HitResult;
+	FHitResult tyson;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(radius);
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(this);
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
 	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
+	
+	bool rHit = GetWorld()->SweepSingleByChannel(tyson, rStart, rEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
+	bool lHit = GetWorld()->SweepSingleByChannel(tyson, lStart, lEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
+
 
 	targetLocation = endPoint;
 	lStartLocation = Lorigin->GetComponentLocation();

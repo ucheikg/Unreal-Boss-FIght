@@ -65,6 +65,9 @@ protected:
 	float rLerpSpeed = 1.9f;
 	float travelDistance = 1000.0f;
 	float delay;
+	float health;
+	float power;
+	float radius;
 
 	FVector lStartLocation;
 	FVector rStartLocation;
@@ -73,4 +76,9 @@ protected:
 	FVector startPoint;
 	FVector endPoint;
 
+	FVector rStart;
+	FVector lStart;
+	
+	FVector rEnd;
+	FVector lEnd;
 };
