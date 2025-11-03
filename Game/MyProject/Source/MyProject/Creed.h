@@ -25,6 +25,14 @@ class MYPROJECT_API ACreed : public ACharacter
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Rorigin;
 
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+
+	UStaticMeshComponent* lcontact;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+
+	UStaticMeshComponent* rcontact;
+
 public:
 	// Sets default values for this character's properties
 	ACreed();

@@ -38,7 +38,7 @@ ACreed::ACreed()
 	health = 100.0f;
 	power = 5.0f;
 
-	radius = 20.0f;
+	radius = 80.0f;
 
 }
 
@@ -58,9 +58,10 @@ void ACreed::Tick(float DeltaTime)
 	endPoint = startPoint + (Camera->GetForwardVector() * 1000);
 
 	rStart = rGlove->GetComponentLocation();
+	
 	lStart = lGlove->GetComponentLocation();
 
-	lEnd = lStart + (lGlove->GetForwardVector() * radius);
+	lEnd = lStart + (lGlove->GetForwardVector().RotateAngleAxis(90, FVector::UpVector) * radius);
 	rEnd = rStart + (rGlove->GetForwardVector() * radius);
 
 	FHitResult HitResult;
@@ -72,8 +73,17 @@ void ACreed::Tick(float DeltaTime)
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
 	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
 	
+	
 	bool rHit = GetWorld()->SweepSingleByChannel(tyson, rStart, rEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
+	
+	DrawDebugSphere(GetWorld(), rStart, Sphere.GetSphereRadius(), 12, FColor::Red, false, 2.0f);
+	DrawDebugLine(GetWorld(), rStart, rEnd, FColor::Red, false, 2.0f, 0, 2.0f);
+	
+	
 	bool lHit = GetWorld()->SweepSingleByChannel(tyson, lStart, lEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
+	
+	DrawDebugLine(GetWorld(), lStart, lEnd, FColor::Blue, false, 2.0f, 0, 2.0f);
+	DrawDebugSphere(GetWorld(), lEnd, Sphere.GetSphereRadius(), 12, FColor::Cyan, false, 2.0f);
 
 
 	targetLocation = endPoint;
