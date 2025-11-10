@@ -11,6 +11,19 @@ class MYPROJECT_API ATyson_Character : public ACharacter
 {
 	GENERATED_BODY()
 
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* lGlove;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* Lorigin;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* rGlove;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* Rorigin;
+
+
 public:
 	// Sets default values for this character's properties
 	ATyson_Character();
@@ -19,11 +32,43 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	void leftHook(); 
+	void rightHook();
 
+protected:
+
+
+	float lAlpha;
+	bool lIsLerping;
+	bool lIsReturning;
+	bool rIsLerping;
+	bool rIsReturning;
+	float rAlpha;
+
+	float lLerpSpeed = 1.9f;
+	float rLerpSpeed = 1.9f;
+	float travelDistance = 1000.0f;
+	float health;
+	float power;
+	float radius;
+
+	FVector lStartLocation;
+	FVector rStartLocation;
+	FVector targetLocation;
+
+	FVector startPoint;
+	FVector endPoint;
+
+	FVector rStart;
+	FVector lStart;
+
+	FVector rEnd;
+	FVector lEnd;
 };
