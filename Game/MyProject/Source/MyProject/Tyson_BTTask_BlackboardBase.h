@@ -13,5 +13,11 @@ UCLASS()
 class MYPROJECT_API UTyson_BTTask_BlackboardBase : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
+
+public:
+	UTyson_BTTask_BlackboardBase();
+
+protected:
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	
 };
