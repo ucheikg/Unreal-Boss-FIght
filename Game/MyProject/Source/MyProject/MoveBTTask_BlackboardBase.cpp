@@ -10,6 +10,8 @@ UMoveBTTask_BlackboardBase::UMoveBTTask_BlackboardBase() {
     NodeName = TEXT("Close in");
 }
 
+
+
 EBTNodeResult::Type UMoveBTTask_BlackboardBase::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) {
 
     AAIController* AIController = OwnerComp.GetAIOwner();
@@ -18,9 +20,25 @@ EBTNodeResult::Type UMoveBTTask_BlackboardBase::ExecuteTask(UBehaviorTreeCompone
     ATyson_Character* Boss = Cast<ATyson_Character>(AIController->GetPawn());
     if (!Boss) return EBTNodeResult::Failed;
 
-    Boss->rightHook();
+    if (Boss->withinRange = false) {
+        
+    }
+    else {
+        return EBTNodeResult::Succeeded;
+    }
 
-    return EBTNodeResult::Succeeded;
 }
 
+void ATyson_Character::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (withinRange = false) {
+        timeOut += DeltaTime;
+    }
+    else {
+        
+    }
+
+}
 
