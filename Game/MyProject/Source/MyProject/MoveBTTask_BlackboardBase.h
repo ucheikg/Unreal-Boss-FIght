@@ -13,4 +13,10 @@ UCLASS()
 class MYPROJECT_API UMoveBTTask_BlackboardBase : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
+
+public:
+	UMoveBTTask_BlackboardBase();
+	
+protected:
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };
