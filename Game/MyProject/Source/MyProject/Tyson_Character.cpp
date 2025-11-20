@@ -20,14 +20,6 @@ ATyson_Character::ATyson_Character()
 	Lorigin->SetupAttachment(RootComponent);
 	Rorigin = CreateDefaultSubobject<UStaticMeshComponent>("Rorigin");
 	Rorigin->SetupAttachment(RootComponent);
-	
-	Range = CreateDefaultSubobject<UBoxComponent>("Range");
-	Range->SetupAttachment(RootComponent);
-
-	Range->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Range->SetCollisionObjectType(ECC_Pawn);
-	Range->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Range->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
 	lAlpha = 0.0f;
 	lIsLerping = false;
@@ -48,8 +40,6 @@ ATyson_Character::ATyson_Character()
 void ATyson_Character::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Range->OnComponentBeginOverlap.AddDynamic(this, &ATyson_Character::onTouch);
 	
 }
 
@@ -194,12 +184,4 @@ void ATyson_Character::moveTowards() {
 
 
 }
-
-void ATyson_Character::onTouch(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& rangeResult)
-{
-	if ((Cast<ACreed>(OtherActor))){
-		withinRange = true;
-	}
-}
-
 

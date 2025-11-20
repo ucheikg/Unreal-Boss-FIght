@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "Components/BoxComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Tyson_Character.generated.h"
@@ -23,9 +22,7 @@ class MYPROJECT_API ATyson_Character : public ACharacter
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Rorigin;
-	
-	UPROPERTY(VisibleAnywhere, Category = "Collision")
-	UBoxComponent* Range;
+
 
 public:
 	// Sets default values for this character's properties
@@ -44,14 +41,9 @@ public:
 	
 	void leftHook(); 
 	void rightHook();
-	void moveTowards();	
+	void moveTowards();
+	
 	bool withinRange;
-	float timeOut;
-
-	UFUNCTION()
-	void onTouch(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
-		int32 OtherBodyIndex, bool bFromSweep, 
-		const FHitResult& rangeResult);
 
 protected:
 
