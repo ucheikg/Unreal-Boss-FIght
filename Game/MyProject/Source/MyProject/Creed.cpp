@@ -54,6 +54,7 @@ void ACreed::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+
 	startPoint = Camera->GetComponentLocation();
 	endPoint = startPoint + (Camera->GetForwardVector() * 1000);
 

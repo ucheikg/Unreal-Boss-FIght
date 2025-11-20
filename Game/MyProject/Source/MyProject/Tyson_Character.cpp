@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Tyson_Character.h"
 #include "Creed.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATyson_Character::ATyson_Character()
@@ -21,6 +21,10 @@ ATyson_Character::ATyson_Character()
 	Rorigin = CreateDefaultSubobject<UStaticMeshComponent>("Rorigin");
 	Rorigin->SetupAttachment(RootComponent);
 
+	Range = CreateDefaultSubobject<UStaticMeshComponent>("Range");
+	Range->SetupAttachment(RootComponent);
+
+
 	lAlpha = 0.0f;
 	lIsLerping = false;
 	lIsReturning = false;
@@ -33,6 +37,7 @@ ATyson_Character::ATyson_Character()
 	power = 5.0f;
 
 	radius = 80.0f;
+
 
 }
 
@@ -48,22 +53,27 @@ void ATyson_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	ACreed* creedCharacter = Cast<ACreed>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
 	startPoint = GetActorLocation();
 	endPoint = startPoint + (GetActorForwardVector() * 1000);
 
-	rStart = rGlove->GetComponentLocation();
-
-	lStart = lGlove->GetComponentLocation();
-
-	lEnd = lStart + (lGlove->GetForwardVector().RotateAngleAxis(90, FVector::UpVector) * radius);
-	rEnd = rStart + (rGlove->GetForwardVector() * radius);
+	rangeStart = Range->GetComponentLocation();
+	rangeEnd = rangeStart + (Range->GetForwardVector() * radius);
 
 	FHitResult HitResult;
+	FHitResult player;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(radius);
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(this);
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
 	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
+
+	bool rHit = GetWorld()->SweepSingleByChannel(player, rangeStart, rangeEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
+
+	DrawDebugSphere(GetWorld(), rangeStart, Sphere.GetSphereRadius(), 12, FColor::Red, false, 2.0f);
+	DrawDebugLine(GetWorld(), rangeStart, rangeEnd, FColor::Red, false, 2.0f, 0, 2.0f);
 
 	targetLocation = endPoint;
 	lStartLocation = Lorigin->GetComponentLocation();
@@ -72,6 +82,14 @@ void ATyson_Character::Tick(float DeltaTime)
 	if (bHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+	}
+
+	if (rHit && player.GetActor() == creedCharacter) {
+		inRange = true;
+	}
+	else {
+		
+		inRange = false;
 	}
 
 	if (rIsLerping)
@@ -143,8 +161,6 @@ void ATyson_Character::Tick(float DeltaTime)
 
 	}
 
-
-
 }
 
 // Called to bind functionality to input
@@ -176,12 +192,18 @@ void ATyson_Character::rightHook()
 	rIsReturning = false;
 }
 
-void ATyson_Character::moveTowards() {
+void ATyson_Character::moveTo(float DeltaTime)
+{
+	ACreed* creedCharacter = Cast<ACreed>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	FVector currentLocation = GetActorLocation();
+
+	FVector direction = (creedCharacter->GetActorLocation() - currentLocation);
+	direction.Normalize();
+
+	float Speed = 300.0f;
 	
-	ACreed* player = Cast<ACreed>(GetWorld()->GetFirstPlayerController()->GetPawn());
-
-	SetActorLocation(player->GetActorLocation());
-
+	FVector NewLocation = GetActorLocation() + (direction * Speed * DeltaTime);
+	
+	SetActorLocation(NewLocation);
 
 }
-
