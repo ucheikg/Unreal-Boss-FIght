@@ -23,6 +23,8 @@ class MYPROJECT_API ATyson_Character : public ACharacter
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Rorigin;
 
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* Range;
 
 public:
 	// Sets default values for this character's properties
@@ -41,6 +43,9 @@ public:
 	
 	void leftHook(); 
 	void rightHook();
+	void moveTo(float DeltaTime);
+	float timeOut;
+	bool inRange;
 
 protected:
 
@@ -68,7 +73,9 @@ protected:
 
 	FVector rStart;
 	FVector lStart;
+	FVector rangeStart;
 
 	FVector rEnd;
 	FVector lEnd;
+	FVector rangeEnd;
 };
