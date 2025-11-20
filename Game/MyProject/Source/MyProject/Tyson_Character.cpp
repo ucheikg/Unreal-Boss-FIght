@@ -2,7 +2,6 @@
 
 
 #include "Tyson_Character.h"
-#include "Creed.h"
 
 // Sets default values
 ATyson_Character::ATyson_Character()
@@ -143,8 +142,6 @@ void ATyson_Character::Tick(float DeltaTime)
 
 	}
 
-
-
 }
 
 // Called to bind functionality to input
@@ -174,14 +171,5 @@ void ATyson_Character::rightHook()
 	rAlpha = 0.0f;
 	rIsLerping = true;
 	rIsReturning = false;
-}
-
-void ATyson_Character::moveTowards() {
-	
-	ACreed* player = Cast<ACreed>(GetWorld()->GetFirstPlayerController()->GetPawn());
-
-	SetActorLocation(player->GetActorLocation());
-
-
 }
 

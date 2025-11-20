@@ -41,9 +41,6 @@ public:
 	
 	void leftHook(); 
 	void rightHook();
-	void moveTowards();
-	
-	bool withinRange;
 
 protected:
 
