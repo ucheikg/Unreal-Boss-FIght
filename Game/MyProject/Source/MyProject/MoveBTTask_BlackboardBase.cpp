@@ -11,6 +11,7 @@
 
 UMoveBTTask_BlackboardBase::UMoveBTTask_BlackboardBase() {
     NodeName = TEXT("Move Towards");
+    bNotifyTick = true;
 }
 
 EBTNodeResult::Type UMoveBTTask_BlackboardBase::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -71,6 +72,4 @@ void UMoveBTTask_BlackboardBase::TickTask(UBehaviorTreeComponent& OwnerComp, uin
             return;
         }
     }
-
-    Boss->moveTo(DeltaSeconds);
 }

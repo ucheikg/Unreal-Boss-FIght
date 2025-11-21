@@ -63,6 +63,7 @@ protected:
 	float health;
 	float power;
 	float radius;
+	float dRadius;
 
 	FVector lStartLocation;
 	FVector rStartLocation;
@@ -70,6 +71,7 @@ protected:
 
 	FVector startPoint;
 	FVector endPoint;
+	FVector longPoint;
 
 	FVector rStart;
 	FVector lStart;

@@ -37,7 +37,7 @@ ATyson_Character::ATyson_Character()
 	power = 5.0f;
 
 	radius = 80.0f;
-
+	dRadius = 100.0f;
 
 }
 
@@ -57,9 +57,10 @@ void ATyson_Character::Tick(float DeltaTime)
 
 	startPoint = GetActorLocation();
 	endPoint = startPoint + (GetActorForwardVector() * 1000);
+	longPoint = startPoint + (GetActorForwardVector() * 1600);
 
-	rangeStart = Range->GetComponentLocation();
-	rangeEnd = rangeStart + (Range->GetForwardVector() * radius);
+	rangeStart = endPoint;
+	rangeEnd = rangeStart + (GetActorForwardVector() * dRadius);
 
 	FHitResult HitResult;
 	FHitResult player;
@@ -75,7 +76,6 @@ void ATyson_Character::Tick(float DeltaTime)
 	DrawDebugSphere(GetWorld(), rangeStart, Sphere.GetSphereRadius(), 12, FColor::Red, false, 2.0f);
 	DrawDebugLine(GetWorld(), rangeStart, rangeEnd, FColor::Red, false, 2.0f, 0, 2.0f);
 
-	targetLocation = endPoint;
 	lStartLocation = Lorigin->GetComponentLocation();
 	rStartLocation = Rorigin->GetComponentLocation();
 
@@ -175,6 +175,7 @@ void ATyson_Character::leftHook()
 
 	if (lIsLerping) return;
 	lGlove->GetForwardVector() = Lorigin->GetForwardVector();
+	targetLocation = longPoint;
 
 	lAlpha = 0.0f;
 	lIsLerping = true;
@@ -185,25 +186,9 @@ void ATyson_Character::rightHook()
 {
 	if (rIsLerping) return;
 	rGlove->GetForwardVector() = Rorigin->GetForwardVector();
-
+	targetLocation = endPoint;
 
 	rAlpha = 0.0f;
 	rIsLerping = true;
 	rIsReturning = false;
-}
-
-void ATyson_Character::moveTo(float DeltaTime)
-{
-	ACreed* creedCharacter = Cast<ACreed>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	FVector currentLocation = GetActorLocation();
-
-	FVector direction = (creedCharacter->GetActorLocation() - currentLocation);
-	direction.Normalize();
-
-	float Speed = 300.0f;
-	
-	FVector NewLocation = GetActorLocation() + (direction * Speed * DeltaTime);
-	
-	SetActorLocation(NewLocation);
-
 }
