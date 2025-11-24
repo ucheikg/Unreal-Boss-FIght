@@ -38,6 +38,7 @@ ATyson_Character::ATyson_Character()
 
 	radius = 80.0f;
 	dRadius = 100.0f;
+	health = 100.0f;
 
 }
 
@@ -45,6 +46,9 @@ ATyson_Character::ATyson_Character()
 void ATyson_Character::BeginPlay()
 {
 	Super::BeginPlay();
+
+	lGlove->OnComponentBeginOverlap.AddDynamic(this,&ATyson_Character::OnOverlapStart);
+	rGlove->OnComponentBeginOverlap.AddDynamic(this, &ATyson_Character::OnOverlapStart);
 	
 }
 
@@ -69,12 +73,12 @@ void ATyson_Character::Tick(float DeltaTime)
 	collisionParams.AddIgnoredActor(this);
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
-	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
+	//DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
 
 	bool rHit = GetWorld()->SweepSingleByChannel(player, rangeStart, rangeEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
 
-	DrawDebugSphere(GetWorld(), rangeStart, Sphere.GetSphereRadius(), 12, FColor::Red, false, 2.0f);
-	DrawDebugLine(GetWorld(), rangeStart, rangeEnd, FColor::Red, false, 2.0f, 0, 2.0f);
+	//DrawDebugSphere(GetWorld(), rangeStart, Sphere.GetSphereRadius(), 12, FColor::Red, false, 2.0f);
+	//DrawDebugLine(GetWorld(), rangeStart, rangeEnd, FColor::Red, false, 2.0f, 0, 2.0f);
 
 	lStartLocation = Lorigin->GetComponentLocation();
 	rStartLocation = Rorigin->GetComponentLocation();
@@ -161,6 +165,10 @@ void ATyson_Character::Tick(float DeltaTime)
 
 	}
 
+	if (health <= 0) {
+		this->Destroy();
+	}
+
 }
 
 // Called to bind functionality to input
@@ -191,4 +199,20 @@ void ATyson_Character::rightHook()
 	rAlpha = 0.0f;
 	rIsLerping = true;
 	rIsReturning = false;
+}
+
+void ATyson_Character::damaged()
+{
+	health--;
+}
+
+void ATyson_Character::OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ACreed* player = Cast<ACreed>(OtherActor);
+	if (player != nullptr) {
+		player->damaged();
+	}
+
+
 }

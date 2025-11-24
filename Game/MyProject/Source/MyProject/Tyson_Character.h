@@ -43,7 +43,7 @@ public:
 	
 	void leftHook(); 
 	void rightHook();
-	void moveTo(float DeltaTime);
+	void damaged();
 	float timeOut;
 	bool inRange;
 
@@ -80,4 +80,7 @@ protected:
 	FVector rEnd;
 	FVector lEnd;
 	FVector rangeEnd;
+
+	UFUNCTION() void OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

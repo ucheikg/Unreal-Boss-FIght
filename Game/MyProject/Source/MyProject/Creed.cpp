@@ -5,23 +5,24 @@
 #include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Actor.h"
+#include "Tyson_Character.h"
 
 // Sets default values
 ACreed::ACreed()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
 	Camera->bUsePawnControlRotation = true;
-	
+
 	lGlove = CreateDefaultSubobject<UStaticMeshComponent>("lGlove");
 	lGlove->SetupAttachment(RootComponent);
 	rGlove = CreateDefaultSubobject<UStaticMeshComponent>("rGlove");
 	rGlove->SetupAttachment(RootComponent);
-	
-	
+
+
 	Lorigin = CreateDefaultSubobject<UStaticMeshComponent>("Loriginmesh");
 	Lorigin->SetupAttachment(RootComponent);
 	Rorigin = CreateDefaultSubobject<UStaticMeshComponent>("Rorigin");
@@ -30,7 +31,7 @@ ACreed::ACreed()
 	lAlpha = 0.0f;
 	lIsLerping = false;
 	lIsReturning = false;
-	
+
 	rAlpha = 0.0f;
 	rIsLerping = false;
 	rIsReturning = false;
@@ -39,13 +40,15 @@ ACreed::ACreed()
 	power = 5.0f;
 
 	radius = 80.0f;
-
 }
 
 // Called when the game starts or when spawned
 void ACreed::BeginPlay()
 {
 	Super::BeginPlay();
+
+	lGlove->OnComponentBeginOverlap.AddDynamic(this, &ACreed::OnOverlapStart);
+	rGlove->OnComponentBeginOverlap.AddDynamic(this, &ACreed::OnOverlapStart);
 	
 }
 
@@ -53,7 +56,6 @@ void ACreed::BeginPlay()
 void ACreed::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 
 	startPoint = Camera->GetComponentLocation();
 	endPoint = startPoint + (Camera->GetForwardVector() * 1000);
@@ -74,18 +76,6 @@ void ACreed::Tick(float DeltaTime)
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
 	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
 	
-	
-	bool rHit = GetWorld()->SweepSingleByChannel(tyson, rStart, rEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
-	
-	DrawDebugSphere(GetWorld(), rStart, Sphere.GetSphereRadius(), 12, FColor::Red, false, 2.0f);
-	DrawDebugLine(GetWorld(), rStart, rEnd, FColor::Red, false, 2.0f, 0, 2.0f);
-	
-	
-	bool lHit = GetWorld()->SweepSingleByChannel(tyson, lStart, lEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
-	
-	DrawDebugLine(GetWorld(), lStart, lEnd, FColor::Blue, false, 2.0f, 0, 2.0f);
-	DrawDebugSphere(GetWorld(), lEnd, Sphere.GetSphereRadius(), 12, FColor::Cyan, false, 2.0f);
-
 
 	targetLocation = endPoint;
 	lStartLocation = Lorigin->GetComponentLocation();
@@ -165,6 +155,10 @@ void ACreed::Tick(float DeltaTime)
 
 	}
 
+	if (health <= 0) {
+		this->Destroy();
+	}
+
 }
 
 // Called to bind functionality to input
@@ -232,6 +226,22 @@ void ACreed::rightHook()
 	rAlpha = 0.0f;
 	rIsLerping = true;
 	rIsReturning = false;
+}
+
+void ACreed::OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ATyson_Character* boss = Cast<ATyson_Character>(OtherActor);
+	if (boss != nullptr) {
+		boss->damaged();
+	}
+
+
+}
+
+void ACreed::damaged()
+{
+	health--;
 }
 
 

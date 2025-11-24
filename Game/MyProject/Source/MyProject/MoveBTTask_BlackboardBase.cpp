@@ -28,7 +28,7 @@ EBTNodeResult::Type UMoveBTTask_BlackboardBase::ExecuteTask(UBehaviorTreeCompone
 
     FAIMoveRequest MoveRequest;
     MoveRequest.SetGoalActor(creedCharacter);
-    MoveRequest.SetAcceptanceRadius(1000.0f);
+    MoveRequest.SetAcceptanceRadius(80.0f);
 
     FNavPathSharedPtr NavPath;
     AIController->MoveTo(MoveRequest, &NavPath);
@@ -39,29 +39,21 @@ EBTNodeResult::Type UMoveBTTask_BlackboardBase::ExecuteTask(UBehaviorTreeCompone
 void UMoveBTTask_BlackboardBase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
     AAIController* AIController = OwnerComp.GetAIOwner();
-    if (!AIController) {
-        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-        return;
-    }
-
-    ATyson_Character* Boss = Cast<ATyson_Character>(AIController->GetPawn());
-    if (!Boss) {
-        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-        return;
-    }
+    if (!AIController) { FinishLatentTask(OwnerComp, EBTNodeResult::Failed); return; }
 
     ACreed* creedCharacter = Cast<ACreed>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-    if (!creedCharacter) {
-        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-        return;
-    }
+    if (!creedCharacter) { FinishLatentTask(OwnerComp, EBTNodeResult::Failed); return; }
 
-    Boss->inRange;
 
-    if (Boss->inRange) {
-        Boss->timeOut = 0.0f;
+    AIController->MoveToActor(creedCharacter, 50.0f, true, true, false, nullptr, true);
+
+    ATyson_Character* Boss = Cast<ATyson_Character>(AIController->GetPawn());
+    if (!Boss) { FinishLatentTask(OwnerComp, EBTNodeResult::Failed); return; }
+
+    if (Boss->inRange)
+    {
+        AIController->StopMovement();
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-        return;
     }
     else {
         Boss->timeOut += DeltaSeconds;
