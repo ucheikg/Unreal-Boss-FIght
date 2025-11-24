@@ -28,7 +28,7 @@ EBTNodeResult::Type UMoveBTTask_BlackboardBase::ExecuteTask(UBehaviorTreeCompone
 
     FAIMoveRequest MoveRequest;
     MoveRequest.SetGoalActor(creedCharacter);
-    MoveRequest.SetAcceptanceRadius(80.0f);
+    MoveRequest.SetAcceptanceRadius(1000.0f);
 
     FNavPathSharedPtr NavPath;
     AIController->MoveTo(MoveRequest, &NavPath);
