@@ -26,9 +26,6 @@ class MYPROJECT_API ATyson_Character : public ACharacter
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Range;
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* head;
-
 public:
 	// Sets default values for this character's properties
 	ATyson_Character();

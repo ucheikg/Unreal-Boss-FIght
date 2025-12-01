@@ -74,7 +74,7 @@ void ACreed::Tick(float DeltaTime)
 	collisionParams.AddIgnoredActor(this);
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
-	DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
+	
 	
 
 	targetLocation = endPoint;

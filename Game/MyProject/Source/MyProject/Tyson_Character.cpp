@@ -24,9 +24,6 @@ ATyson_Character::ATyson_Character()
 	Range = CreateDefaultSubobject<UStaticMeshComponent>("Range");
 	Range->SetupAttachment(RootComponent);
 
-	head = CreateDefaultSubobject<UStaticMeshComponent>("Head");
-	head->SetupAttachment(RootComponent);
-
 
 	lAlpha = 0.0f;
 	lIsLerping = false;
@@ -171,14 +168,6 @@ void ATyson_Character::Tick(float DeltaTime)
 	if (health <= 0) {
 		this->Destroy();
 	}
-
-	FVector newlocation = head->GetComponentLocation();
-
-	float runningTime = GetGameTimeSinceCreation();
-	float deltaHeight = (FMath::Sin(runningTime * DeltaTime) - FMath::Sin(runningTime)/2);
-	newlocation.Z += deltaHeight * 1.0f;
-
-	head->SetWorldLocation(newlocation);
 
 }
 
