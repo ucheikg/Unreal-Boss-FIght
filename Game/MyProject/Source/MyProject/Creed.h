@@ -12,7 +12,7 @@ UCLASS()
 class MYPROJECT_API ACreed : public ACharacter
 {
 	GENERATED_BODY()
-
+	// defining components of the blueprint
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* lGlove;
 	
@@ -47,21 +47,22 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// defining a function in public so it can be called by other scripts
 	void damaged();
 
 
 protected:
-	
+	// casting values but should not be used by other scripts
 	float lAlpha;
 	bool lIsLerping;
 	bool lIsReturning;
 	bool rIsLerping;
 	bool rIsReturning;
 	float rAlpha;
-
+	// creating the player camera
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
-
+	// creating  function to be used
 	void MoveFoward(float InputValue);
 	void MoveRight(float InputValue);
 
@@ -71,6 +72,7 @@ protected:
 	void leftHook();
 	void rightHook();
 	
+	// casting values but should not be used by other scripts
 	float lLerpSpeed = 1.9f;
 	float rLerpSpeed = 1.9f;
 	float travelDistance = 1000.0f;
@@ -78,7 +80,7 @@ protected:
 	float health;
 	float power;
 	float radius;
-
+	// creating locations so they can be used
 	FVector lStartLocation;
 	FVector rStartLocation;
 	FVector targetLocation;
@@ -91,7 +93,7 @@ protected:
 	
 	FVector rEnd;
 	FVector lEnd;
-	
+	// creating the overlap function
 	UFUNCTION() void OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
