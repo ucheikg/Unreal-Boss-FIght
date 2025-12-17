@@ -10,7 +10,7 @@ UCLASS()
 class MYPROJECT_API ATyson_Character : public ACharacter
 {
 	GENERATED_BODY()
-
+// creates mesh components for the blueprint
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* lGlove;
 
@@ -40,7 +40,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+	// creates public functions which can be use by other scripts
 	void leftHook(); 
 	void rightHook();
 	void damaged();
@@ -49,7 +49,7 @@ public:
 
 protected:
 
-
+// creates lerping values
 	float lAlpha;
 	bool lIsLerping;
 	bool lIsReturning;
@@ -60,11 +60,12 @@ protected:
 	float lLerpSpeed = 1.9f;
 	float rLerpSpeed = 1.9f;
 	float travelDistance = 1000.0f;
+// boss stats
 	float health;
 	float power;
 	float radius;
 	float dRadius;
-
+// location for object to move to
 	FVector lStartLocation;
 	FVector rStartLocation;
 	FVector targetLocation;
@@ -80,7 +81,7 @@ protected:
 	FVector rEnd;
 	FVector lEnd;
 	FVector rangeEnd;
-
+// defining a overlap function with its parameters
 	UFUNCTION() void OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
