@@ -12,22 +12,23 @@ ACreed::ACreed()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	//setting up a attachment for all object in the blueprint
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
+	//tells the camera to use the rotation of the character
 	Camera->bUsePawnControlRotation = true;
-
+	//setting up a attachment for all object in the blueprint
 	lGlove = CreateDefaultSubobject<UStaticMeshComponent>("lGlove");
 	lGlove->SetupAttachment(RootComponent);
 	rGlove = CreateDefaultSubobject<UStaticMeshComponent>("rGlove");
 	rGlove->SetupAttachment(RootComponent);
 
-
+	//setting up a attachment for all object in the blueprint
 	Lorigin = CreateDefaultSubobject<UStaticMeshComponent>("Loriginmesh");
 	Lorigin->SetupAttachment(RootComponent);
 	Rorigin = CreateDefaultSubobject<UStaticMeshComponent>("Rorigin");
 	Rorigin->SetupAttachment(RootComponent);
-
+	// valuse which will be used later on
 	lAlpha = 0.0f;
 	lIsLerping = false;
 	lIsReturning = false;
@@ -46,7 +47,7 @@ ACreed::ACreed()
 void ACreed::BeginPlay()
 {
 	Super::BeginPlay();
-
+	//if the gloves overlap with a object call the function OnOverlapStart
 	lGlove->OnComponentBeginOverlap.AddDynamic(this, &ACreed::OnOverlapStart);
 	rGlove->OnComponentBeginOverlap.AddDynamic(this, &ACreed::OnOverlapStart);
 	
@@ -56,59 +57,50 @@ void ACreed::BeginPlay()
 void ACreed::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	//start and end values for the raycast
 	startPoint = Camera->GetComponentLocation();
 	endPoint = startPoint + (Camera->GetForwardVector() * 1000);
-
-	rStart = rGlove->GetComponentLocation();
-	
-	lStart = lGlove->GetComponentLocation();
-
-	lEnd = lStart + (lGlove->GetForwardVector().RotateAngleAxis(90, FVector::UpVector) * radius);
-	rEnd = rStart + (rGlove->GetForwardVector() * radius);
-
+	//setting parameters for the raycast
 	FHitResult HitResult;
-	FHitResult tyson;
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(radius);
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(this);
-
+	//draws raycast with the values provided
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
 	
 	
-
+	// sets the target location for the gloves and the gloves origin
 	targetLocation = endPoint;
 	lStartLocation = Lorigin->GetComponentLocation();
 	rStartLocation = Rorigin->GetComponentLocation();
-
-	if (bHit)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
-	}
-
+	// checks if the right hand needs to move
 	if (rIsLerping) 
 	{
+		// the rate at which alpha increases value
 		rAlpha += DeltaTime * rLerpSpeed;
+		//clamps alpha between 0.0f, 1.0f;
 		rAlpha = FMath::Clamp(rAlpha, 0.0f, 1.0f);
-
+		// definig the right gloves new location
 		FVector rnewLocation;
-
+		// if it is not returning then the glove should move to target location within the duration of alpha
 		if (!rIsReturning) {
 			rnewLocation = FMath::Lerp(rStartLocation, targetLocation, rAlpha);
 		}
+		// if it is returning then the glove should move from the target location back to its origin
 		else {
 			rnewLocation = FMath::Lerp(targetLocation, rStartLocation, rAlpha);
 		}
 
+		//cast the gloves location
 		rGlove->SetWorldLocation(rnewLocation);
 
-
+		// make sure alpha  has completed its increase to 1
 		if (rAlpha >= 1.0f) {
-
+			// once its complete it should check if its already returning if not it should start and reset alpha to 0
 			if (!rIsReturning) {
 				rIsReturning = true;
 				rAlpha = 0.0f;
 			}
+			// if it is returning or has already returned it should reset all values
 			else
 			{
 				rIsLerping = false;
@@ -117,8 +109,9 @@ void ACreed::Tick(float DeltaTime)
 			}
 		}
 	}
-	
+	// follows the exact logic of the right glove just applied to the left glove
 	if (lIsLerping) {
+		
 		lAlpha += DeltaTime * lLerpSpeed;
 		lAlpha = FMath::Clamp(lAlpha, 0.0f, 1.0f);
 
@@ -154,7 +147,7 @@ void ACreed::Tick(float DeltaTime)
 		}
 
 	}
-
+	// if health is equal to zero destroy the player
 	if (health <= 0) {
 		this->Destroy();
 	}
@@ -164,6 +157,7 @@ void ACreed::Tick(float DeltaTime)
 // Called to bind functionality to input
 void ACreed::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	// binds the players inputs to functions using Unreal's input system
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACreed::Jump);
 	PlayerInputComponent->BindAction("leftHook", IE_Pressed, this, &ACreed::leftHook);
@@ -176,6 +170,7 @@ void ACreed::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("LookUp", this, &ACreed::LookUp);
 }
 
+// tells the object to move foward or backwards based of what the input value is
 void ACreed::MoveFoward(float InputValue)
 {
 
@@ -183,7 +178,7 @@ void ACreed::MoveFoward(float InputValue)
 	AddMovementInput(FowardDirection, InputValue);
 
 }
-
+// tells object to move left or right based of input value
 void ACreed::MoveRight(float InputValue)
 {
 
@@ -191,6 +186,8 @@ void ACreed::MoveRight(float InputValue)
 	AddMovementInput(RightDirection, InputValue);
 
 }
+
+// tells the camera how to move based of input
 
 void ACreed::TurnCamera(float InputVlaue)
 {
@@ -206,39 +203,42 @@ void ACreed::LookUp(float InputValue)
 
 }
 
+// triggers the left hook attack
 void ACreed::leftHook()
 {
-
+	// stops it from repeating the lerp midway if the are multiple inputs
 	if (lIsLerping) return;
-	lGlove->GetForwardVector() = Lorigin->GetForwardVector();
-
+	// resets alpha and begins lerp
 	lAlpha = 0.0f;
 	lIsLerping = true;
 	lIsReturning = false;
 }
 
+// triggers the right hook attack
 void ACreed::rightHook() 
 {
+	// stops it from repeating the lerp midway if the are multiple inputs
 	if (rIsLerping) return;
-	rGlove->GetForwardVector() = Rorigin->GetForwardVector();
-	
-
+	// resets alpha and begins lerp
 	rAlpha = 0.0f;
 	rIsLerping = true;
 	rIsReturning = false;
 }
 
+// sets parameter for overlap
 void ACreed::OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// cast the boss to a placeholder and also makes it the other actor
 	ATyson_Character* boss = Cast<ATyson_Character>(OtherActor);
+	// boss is the other actor calls damage function in boss
 	if (boss != nullptr) {
 		boss->damaged();
 	}
 
 
 }
-
+// function that decreases player health when hit
 void ACreed::damaged()
 {
 	health--;
