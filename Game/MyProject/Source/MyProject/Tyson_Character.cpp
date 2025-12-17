@@ -9,7 +9,7 @@ ATyson_Character::ATyson_Character()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+// sets up attachment to the root component
 	lGlove = CreateDefaultSubobject<UStaticMeshComponent>("lGlove");
 	lGlove->SetupAttachment(RootComponent);
 	rGlove = CreateDefaultSubobject<UStaticMeshComponent>("rGlove");
@@ -24,7 +24,7 @@ ATyson_Character::ATyson_Character()
 	Range = CreateDefaultSubobject<UStaticMeshComponent>("Range");
 	Range->SetupAttachment(RootComponent);
 
-
+// set values
 	lAlpha = 0.0f;
 	lIsLerping = false;
 	lIsReturning = false;
@@ -46,7 +46,7 @@ ATyson_Character::ATyson_Character()
 void ATyson_Character::BeginPlay()
 {
 	Super::BeginPlay();
-
+// on overlap begin function
 	lGlove->OnComponentBeginOverlap.AddDynamic(this,&ATyson_Character::OnOverlapStart);
 	rGlove->OnComponentBeginOverlap.AddDynamic(this, &ATyson_Character::OnOverlapStart);
 	
@@ -56,38 +56,35 @@ void ATyson_Character::BeginPlay()
 void ATyson_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+// casts Player 
 	ACreed* creedCharacter = Cast<ACreed>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
+// location of the raycast start point and end point
 	startPoint = GetActorLocation();
 	endPoint = startPoint + (GetActorForwardVector() * 1000);
 	longPoint = startPoint + (GetActorForwardVector() * 1600);
-
+// values for the sphere cast to be drawn
 	rangeStart = endPoint;
 	rangeEnd = rangeStart + (GetActorForwardVector() * dRadius);
-
+// the ray cast parameters
 	FHitResult HitResult;
+// the sphere cast parameters
 	FHitResult player;
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(radius);
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(this);
-
+// returns true on bHit if raycast makes contact
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, startPoint, endPoint, ECC_Visibility, collisionParams);
 	//DrawDebugLine(GetWorld(), startPoint, endPoint, FColor::Green, false, 2.0f);
-
+// returns true on rHit if sphere cast makes contact
 	bool rHit = GetWorld()->SweepSingleByChannel(player, rangeStart, rangeEnd, FQuat::Identity, ECC_Visibility, Sphere, collisionParams);
 
 	//DrawDebugSphere(GetWorld(), rangeStart, Sphere.GetSphereRadius(), 12, FColor::Red, false, 2.0f);
 	//DrawDebugLine(GetWorld(), rangeStart, rangeEnd, FColor::Red, false, 2.0f, 0, 2.0f);
-
+// sets start location for gloves
 	lStartLocation = Lorigin->GetComponentLocation();
 	rStartLocation = Rorigin->GetComponentLocation();
-
-	if (bHit)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
-	}
-
+	
+// if rhit is true and the player is the object that made contact then inrange is true
 	if (rHit && player.GetActor() == creedCharacter) {
 		inRange = true;
 	}
@@ -95,30 +92,33 @@ void ATyson_Character::Tick(float DeltaTime)
 		
 		inRange = false;
 	}
-
+// hecks if the glove is learping
 	if (rIsLerping)
 	{
+		// has alpha increase between 0 to 1
 		rAlpha += DeltaTime * rLerpSpeed;
 		rAlpha = FMath::Clamp(rAlpha, 0.0f, 1.0f);
-
+// defines a new location in the game world
 		FVector rnewLocation;
-
+// if it is not returning the glove should go to the target location
 		if (!rIsReturning) {
 			rnewLocation = FMath::Lerp(rStartLocation, targetLocation, rAlpha);
 		}
+// else it should retunr to its origin
 		else {
 			rnewLocation = FMath::Lerp(targetLocation, rStartLocation, rAlpha);
 		}
-
+// sets glove location to new location
 		rGlove->SetWorldLocation(rnewLocation);
 
-
+// checks if alpha has completed its increase to 1 before teriggering return
 		if (rAlpha >= 1.0f) {
-
+// if it is not returning it begins return and resets alpha to 0.0f
 			if (!rIsReturning) {
 				rIsReturning = true;
 				rAlpha = 0.0f;
 			}
+// if it has already returned then it should  reset all booleans and values for a new punch
 			else
 			{
 				rIsLerping = false;
@@ -127,7 +127,7 @@ void ATyson_Character::Tick(float DeltaTime)
 			}
 		}
 	}
-
+// same logic as rISLerping
 	if (lIsLerping) {
 		lAlpha += DeltaTime * lLerpSpeed;
 		lAlpha = FMath::Clamp(lAlpha, 0.0f, 1.0f);
@@ -164,27 +164,20 @@ void ATyson_Character::Tick(float DeltaTime)
 		}
 
 	}
-
+// if the the boss is health is zero destory the boss
 	if (health <= 0) {
 		this->Destroy();
 	}
 
 }
 
-// Called to bind functionality to input
-void ATyson_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
 void ATyson_Character::leftHook()
 {
-
+// if it is already lerping return
 	if (lIsLerping) return;
-	lGlove->GetForwardVector() = Lorigin->GetForwardVector();
+//sets target location
 	targetLocation = longPoint;
-
+// sets returning to falst alpha to 0 and lerping to true
 	lAlpha = 0.0f;
 	lIsLerping = true;
 	lIsReturning = false;
@@ -192,23 +185,25 @@ void ATyson_Character::leftHook()
 
 void ATyson_Character::rightHook()
 {
+// if it is already lerping return
 	if (rIsLerping) return;
-	rGlove->GetForwardVector() = Rorigin->GetForwardVector();
+//sets target location
 	targetLocation = endPoint;
-
+// sets returning to falst alpha to 0 and lerping to true
 	rAlpha = 0.0f;
 	rIsLerping = true;
 	rIsReturning = false;
 }
-
+// function which subtracts health
 void ATyson_Character::damaged()
 {
 	health--;
 }
-
+// overlap function which tells pawn what to do upon overlap
 void ATyson_Character::OnOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	//cast player and calls their damage function
 	ACreed* player = Cast<ACreed>(OtherActor);
 	if (player != nullptr) {
 		player->damaged();
