@@ -15,10 +15,12 @@ class MYPROJECT_API ULongRangeBTTask_BlackboardBase : public UBTTask_BlackboardB
 	GENERATED_BODY()
 
 public:
+// defines a function which can be called outside the script
 	ULongRangeBTTask_BlackboardBase();
 
 
 protected:
+// creates the function and sets parameters
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 };
